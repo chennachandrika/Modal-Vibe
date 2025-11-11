@@ -59,21 +59,39 @@ To deploy to Modal:
 Then, deploy the application with Modal:
 
 ```bash
-modal deploy -m main
+python3 -m modal deploy -m main
 ```
 
 ### Local Development
 
+**Run the app locally:**
+
+```bash
+python3 -m modal serve -m main
+```
+
+or
+
+```bash
+python3 -m modal serve main.py
+```
+
+This will start the FastAPI app locally and provide a URL to access it. Make sure you have:
+1. Created the `.env` file with your Azure OpenAI credentials
+2. Created the Modal secret `anthropic-secret` with your Azure OpenAI credentials
+
+**Other development commands:**
+
 Run a load test:
 
 ```bash
-modal run main.py::create_app_loadtest_function --num-apps 10
+python3 -m modal run main.py::create_app_loadtest_function --num-apps 10
 ```
 
 Delete a sandbox:
 
 ```bash
-modal run main.py::delete_sandbox_admin_function --app-id <APP_ID>
+python3 -m modal run main.py::delete_sandbox_admin_function --app-id <APP_ID>
 ```
 
 Run an example sandbox HTTP server:

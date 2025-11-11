@@ -65,7 +65,25 @@ modal secret list
 
 You should see `anthropic-secret` in the list.
 
-## 3. Deploy
+## 3. Run Locally
+
+For local development, use:
+
+```bash
+modal serve -m main
+```
+
+or
+
+```bash
+python3 -m modal serve main.py
+```
+
+This will start the FastAPI app locally and provide a URL to access it.
+
+**Note:** For local development, you still need the Modal secret configured, as the app runs in Modal's cloud environment even when using `modal serve`.
+
+## 4. Deploy to Production
 
 After setting up the Modal secret, deploy the app:
 

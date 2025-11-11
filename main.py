@@ -94,7 +94,7 @@ async def create_sandbox_app(prompt: str) -> str:
     min_containers=1
 )
 @modal.concurrent(max_inputs=100)
-@modal.asgi_app(custom_domains=["vibes.modal.chat"])
+@modal.asgi_app()
 def fastapi_app():
     from fastapi import FastAPI, Request, HTTPException
     from fastapi.responses import JSONResponse
