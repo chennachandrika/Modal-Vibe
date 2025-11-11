@@ -161,6 +161,26 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
               </svg>
             </button>
+            <button 
+              id="downloadButton" 
+              onclick="downloadCode()"
+              class="p-1 hover:bg-white/10 rounded transition-colors"
+              title="Download React component code (.tsx file)"
+            >
+              <svg class="w-5 h-5 text-gray-400 hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+            </button>
+            <button 
+              id="viewCodeButton" 
+              onclick="viewCode()"
+              class="p-1 hover:bg-white/10 rounded transition-colors"
+              title="View React component code"
+            >
+              <svg class="w-5 h-5 text-gray-400 hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+              </svg>
+            </button>
           </div>
       </div>
       <div class="flex-1 relative">
@@ -219,6 +239,53 @@
         <svg class="w-4 h-4 inline-block ml-2 hidden animate-spin" id="featureSpinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- View Code Modal -->
+<div id="viewCodeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col border border-white/10">
+    <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center">
+      <h3 class="text-xl font-semibold text-white">React Component Code</h3>
+      <button
+        onclick="hideViewCodeModal()"
+        class="text-gray-400 hover:text-white transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-auto p-6">
+      <pre id="codeDisplay" class="bg-gray-900 rounded-lg p-4 text-sm text-gray-300 font-mono overflow-x-auto whitespace-pre-wrap"><code>Loading code...</code></pre>
+    </div>
+    <div class="px-6 py-4 border-t border-white/10 flex gap-3 justify-end">
+      <button
+        onclick="copyCodeToClipboard()"
+        id="copyCodeButton"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        <span id="copyCodeButtonText">Copy Code</span>
+      </button>
+      <button
+        onclick="downloadCodeFromModal()"
+        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
+        Download
+      </button>
+      <button
+        onclick="hideViewCodeModal()"
+        class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200"
+      >
+        Close
       </button>
     </div>
   </div>
@@ -490,6 +557,111 @@ async function updateContent(text) {
     } finally {
         setLoading(false);
     }
+}
+
+let currentCodeData = null;
+
+async function downloadCode() {
+    try {
+        const data = await fetchCodeData();
+        downloadCodeFile(data);
+    } catch (err) {
+        console.error('Error downloading code:', err);
+        window.toast.show('Error: Could not download code');
+    }
+}
+
+async function viewCode() {
+    try {
+        showViewCodeModal();
+        const data = await fetchCodeData();
+        currentCodeData = data;
+        displayCode(data.code);
+    } catch (err) {
+        console.error('Error fetching code:', err);
+        window.toast.show('Error: Could not fetch code');
+        hideViewCodeModal();
+    }
+}
+
+async function fetchCodeData() {
+    const res = await fetch(`/api/app/${APP_ID}/code`);
+    if (!res.ok) {
+        throw new Error('Failed to fetch code');
+    }
+    return await res.json();
+}
+
+function displayCode(code) {
+    const codeDisplay = document.getElementById('codeDisplay');
+    if (codeDisplay) {
+        codeDisplay.querySelector('code').textContent = code || '// No code available';
+    }
+}
+
+function downloadCodeFile(data) {
+    const code = data.code || '';
+    const title = data.title || 'LLMComponent';
+    const appId = data.app_id || APP_ID;
+    
+    // Create a blob with the code
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.replace(/[^a-z0-9]/gi, '_')}_${appId.substring(0, 8)}.tsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    window.toast.show('Code downloaded successfully!', 'success');
+}
+
+function downloadCodeFromModal() {
+    if (currentCodeData) {
+        downloadCodeFile(currentCodeData);
+    }
+}
+
+async function copyCodeToClipboard() {
+    if (!currentCodeData || !currentCodeData.code) {
+        window.toast.show('No code to copy');
+        return;
+    }
+    
+    try {
+        await navigator.clipboard.writeText(currentCodeData.code);
+        const button = document.getElementById('copyCodeButtonText');
+        if (button) {
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+        window.toast.show('Code copied to clipboard!', 'success');
+    } catch (err) {
+        console.error('Error copying code:', err);
+        window.toast.show('Error: Could not copy code');
+    }
+}
+
+function showViewCodeModal() {
+    const modal = document.getElementById('viewCodeModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function hideViewCodeModal() {
+    const modal = document.getElementById('viewCodeModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentCodeData = null;
 }
 
 document.getElementById('editForm').addEventListener('submit', async e => {

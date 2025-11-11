@@ -262,6 +262,18 @@ def fastapi_app():
         app = _get_app_or_raise(app_id)
         return JSONResponse({"status": app.metadata.status.value})
 
+    @web_app.get("/api/app/{app_id}/code")
+    async def get_app_code(app_id: str):
+        """Get the current React component code for the app"""
+        app = _get_app_or_raise(app_id)
+        return JSONResponse({
+            "code": app.data.current_component,
+            "app_id": app_id,
+            "title": app.metadata.title if hasattr(app.metadata, 'title') else "",
+            "created_at": app.metadata.created_at.isoformat() if hasattr(app.metadata, 'created_at') else None,
+            "updated_at": app.metadata.updated_at.isoformat() if hasattr(app.metadata, 'updated_at') else None,
+        })
+
     @web_app.get("/api/app/{app_id}/ping")
     async def ping_app(app_id: str):
         app = _get_app_or_raise(app_id)
