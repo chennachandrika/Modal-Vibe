@@ -25,7 +25,7 @@ core_image = (
         "python-multipart",
         "httpx",
         "python-dotenv",
-        "anthropic",
+        "openai",
         "tqdm",
     )
     .add_local_dir("core", "/root/core")

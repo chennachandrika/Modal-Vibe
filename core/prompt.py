@@ -1,10 +1,10 @@
 """Prompting texts used to build the sandbox app."""
 
 from core.llm import generate_response
-import anthropic
 from core.models import Message
+import typing as t
 
-async def _generate_init_edit(client: anthropic.Anthropic, message: str) -> str:
+async def _generate_init_edit(client: t.Any, message: str) -> str:
     prompt = f"""
     You are given the following prompt and your job is to generate a React component that is a good example of the prompt.
     You should use Tailwind CSS for styling. Please make sure to export the component as default.
@@ -29,7 +29,7 @@ async def _generate_init_edit(client: anthropic.Anthropic, message: str) -> str:
     return response
 
 async def _explain_init_edit(
-    message: str, html: str, client: anthropic.Anthropic
+    message: str, html: str, client: t.Any
 ) -> str:
     prompt = f"""
     You were given the following prompt and you generated the following React component:
@@ -47,17 +47,17 @@ async def _explain_init_edit(
     explanation = await generate_response(
         client,
         prompt,
-        model="claude-3-5-haiku-20241022",
+        model="gpt-4o",
         max_tokens=64,
     )
     return explanation
 
-async def generate_and_explain_init_edit(client: anthropic.Anthropic, message: str) -> tuple[str, str]:
+async def generate_and_explain_init_edit(client: t.Any, message: str) -> tuple[str, str]:
     edit = await _generate_init_edit(client, message)
     explanation = await _explain_init_edit(message, edit, client)
     return edit, explanation
 
-async def _generate_followup_edit(client: anthropic.Anthropic, message: str, original_html: str, message_history: list[Message]) -> str:
+async def _generate_followup_edit(client: t.Any, message: str, original_html: str, message_history: list[Message]) -> str:
     message_history = '\n'.join([f"{msg.type}: {msg.content}" for msg in message_history])
 
     prompt = f"""
@@ -92,7 +92,7 @@ async def _generate_followup_edit(client: anthropic.Anthropic, message: str, ori
     return await generate_response(client, prompt)
 
 
-async def _explain_followup_edit(client: anthropic.Anthropic, message: str, original_html: str, new_html: str) -> str:
+async def _explain_followup_edit(client: t.Any, message: str, original_html: str, new_html: str) -> str:
     prompt = f"""
     You generated the following React component edit to the prompt:
 
@@ -112,7 +112,7 @@ async def _explain_followup_edit(client: anthropic.Anthropic, message: str, orig
     explanation = await generate_response(
         client,
         prompt,
-        model="claude-3-5-haiku-20241022",
+        model="gpt-4o",
         max_tokens=64,
     )
     return explanation

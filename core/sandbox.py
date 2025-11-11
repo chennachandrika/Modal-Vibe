@@ -3,7 +3,6 @@ from core.models import AppData, AppMetadata, AppStatus, Message, MessageType
 from core.prompt import generate_and_explain_init_edit, _generate_followup_edit, _explain_followup_edit
 import httpx
 import modal
-import anthropic
 from datetime import datetime
 import typing as t
 
@@ -23,7 +22,7 @@ class SandboxApp:
     def __init__(
         self,
         app_id: str,
-        client: anthropic.Anthropic,
+        client: t.Any,
         metadata: AppMetadata,
         data: AppData,
     ):
@@ -35,7 +34,7 @@ class SandboxApp:
     @staticmethod
     async def create(
         app: modal.App, 
-        client: anthropic.Anthropic,
+        client: t.Any,
         message: str,
         image: modal.Image,
     ) -> "SandboxApp":
@@ -168,7 +167,7 @@ class AppDirectory:
     """Manages the directory of created sandbox apps."""
     apps: dict[str, AppMetadata] = {}
 
-    def __init__(self, apps_dict: modal.Dict, app: modal.App, client: anthropic.Anthropic):
+    def __init__(self, apps_dict: modal.Dict, app: modal.App, client: t.Any):
         self.apps_dict = apps_dict
         self.app = app
         self.client = client

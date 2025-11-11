@@ -39,8 +39,22 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 
 ### Deploy
 
-To deploy to Modal, copy `.env.example` to a file called `.env` and add your `ANTHROPIC_API_KEY`.
-Also, create a [Modal Secret](https://modal.com/docs/guide/secrets) called `anthropic-secret` so our applications can access it.
+To deploy to Modal:
+
+1. Copy `.env.example` to a file called `.env` and fill in your Azure OpenAI credentials:
+   - `AZURE_OPENAI_API_KEY`: Your Azure OpenAI API key
+   - `AZURE_OPENAI_API_BASE`: Your Azure OpenAI base URL (e.g., `https://your-resource-name.openai.azure.com`)
+   - `AZURE_OPENAI_API_VERSION`: API version (default: `2025-01-01-preview`)
+   - `AZURE_OPENAI_DEPLOYMENT`: Deployment name (default: `gpt-4o`)
+
+2. Create a [Modal Secret](https://modal.com/docs/guide/secrets) called `anthropic-secret` with all the Azure OpenAI environment variables:
+   ```bash
+   modal secret create anthropic-secret \
+     AZURE_OPENAI_API_KEY="your-key" \
+     AZURE_OPENAI_API_BASE="https://your-resource.openai.azure.com" \
+     AZURE_OPENAI_API_VERSION="2025-01-01-preview" \
+     AZURE_OPENAI_DEPLOYMENT="gpt-4o"
+   ```
 
 Then, deploy the application with Modal:
 
